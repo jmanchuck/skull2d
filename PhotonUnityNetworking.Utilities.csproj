@@ -275,11 +275,11 @@
     <Reference Include="UnityEditor.LinuxStandalone.Extensions">
         <HintPath>/Applications/Unity/Hub/Editor/2020.1.4f1/PlaybackEngines/LinuxStandaloneSupport/UnityEditor.LinuxStandalone.Extensions.dll</HintPath>
     </Reference>
-    <Reference Include="Photon3Unity3D">
-        <HintPath>/Users/jmanchuck/Coding_Projects/Skull2D/Assets/Photon/PhotonLibs/netstandard2.0/Photon3Unity3D.dll</HintPath>
-    </Reference>
     <Reference Include="websocket-sharp">
         <HintPath>/Users/jmanchuck/Coding_Projects/Skull2D/Assets/Photon/PhotonLibs/WebSocket/websocket-sharp.dll</HintPath>
+    </Reference>
+    <Reference Include="Photon3Unity3D">
+        <HintPath>/Users/jmanchuck/Coding_Projects/Skull2D/Assets/Photon/PhotonLibs/netstandard2.0/Photon3Unity3D.dll</HintPath>
     </Reference>
     <Reference Include="UnityEditor.iOS.Extensions.Xcode">
         <HintPath>/Applications/Unity/Hub/Editor/2020.1.4f1/PlaybackEngines/iOSSupport/UnityEditor.iOS.Extensions.Xcode.dll</HintPath>
