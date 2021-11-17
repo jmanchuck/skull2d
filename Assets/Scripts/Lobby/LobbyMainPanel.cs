@@ -22,8 +22,6 @@ namespace Photon.Pun.Demo.Asteroids
         public InputField RoomNameInputField;
         public InputField MaxPlayersInputField;
 
-        [Header("Join Random Room Panel")]
-        public GameObject JoinRandomRoomPanel;
 
         [Header("Room List Panel")]
         public GameObject RoomListPanel;
@@ -49,7 +47,7 @@ namespace Photon.Pun.Demo.Asteroids
 
             cachedRoomList = new Dictionary<string, RoomInfo>();
             roomListEntries = new Dictionary<string, GameObject>();
-            
+
             PlayerNameInput.text = "Player " + Random.Range(1000, 10000);
         }
 
@@ -59,11 +57,13 @@ namespace Photon.Pun.Demo.Asteroids
 
         public override void OnConnectedToMaster()
         {
+            Debug.Log("OnConnectedToMaster");
             this.SetActivePanel(SelectionPanel.name);
         }
 
         public override void OnRoomListUpdate(List<RoomInfo> roomList)
         {
+            Debug.Log("OnRoomListUpdate");
             ClearRoomListView();
 
             UpdateCachedRoomList(roomList);
@@ -72,6 +72,8 @@ namespace Photon.Pun.Demo.Asteroids
 
         public override void OnJoinedLobby()
         {
+            Debug.Log("OnJoinedLobby");
+
             // whenever this joins a new lobby, clear any previous room lists
             cachedRoomList.Clear();
             ClearRoomListView();
@@ -80,6 +82,7 @@ namespace Photon.Pun.Demo.Asteroids
         // note: when a client joins / creates a room, OnLeftLobby does not get called, even if the client was in a lobby before
         public override void OnLeftLobby()
         {
+            Debug.Log("OnLeftLobby");
             cachedRoomList.Clear();
             ClearRoomListView();
         }
@@ -96,15 +99,17 @@ namespace Photon.Pun.Demo.Asteroids
 
         public override void OnJoinRandomFailed(short returnCode, string message)
         {
+            Debug.Log("OnJoinRandomFailed");
             string roomName = "Room " + Random.Range(1000, 10000);
 
-            RoomOptions options = new RoomOptions {MaxPlayers = 8};
+            RoomOptions options = new RoomOptions { MaxPlayers = 8 };
 
             PhotonNetwork.CreateRoom(roomName, options, null);
         }
 
         public override void OnJoinedRoom()
         {
+            Debug.Log("OnJoinedRoom");
             // joining (or entering) a room invalidates any cached lobby room list (even if LeaveLobby was not called due to just joining a room)
             cachedRoomList.Clear();
 
@@ -126,7 +131,7 @@ namespace Photon.Pun.Demo.Asteroids
                 object isPlayerReady;
                 if (p.CustomProperties.TryGetValue(AsteroidsGame.PLAYER_READY, out isPlayerReady))
                 {
-                    entry.GetComponent<PlayerListEntry>().SetPlayerReady((bool) isPlayerReady);
+                    entry.GetComponent<PlayerListEntry>().SetPlayerReady((bool)isPlayerReady);
                 }
 
                 playerListEntries.Add(p.ActorNumber, entry);
@@ -134,15 +139,16 @@ namespace Photon.Pun.Demo.Asteroids
 
             StartGameButton.gameObject.SetActive(CheckPlayersReady());
 
-            Hashtable props = new Hashtable
-            {
-                {AsteroidsGame.PLAYER_LOADED_LEVEL, false}
-            };
-            PhotonNetwork.LocalPlayer.SetCustomProperties(props);
+            // Hashtable props = new Hashtable
+            // {
+            //     {AsteroidsGame.PLAYER_LOADED_LEVEL, false}
+            // };
+            // PhotonNetwork.LocalPlayer.SetCustomProperties(props);
         }
 
         public override void OnLeftRoom()
         {
+            Debug.Log("OnLeftRoom");
             SetActivePanel(SelectionPanel.name);
 
             foreach (GameObject entry in playerListEntries.Values)
@@ -156,6 +162,7 @@ namespace Photon.Pun.Demo.Asteroids
 
         public override void OnPlayerEnteredRoom(Player newPlayer)
         {
+            Debug.Log("OnPlayerEnteredRoom");
             GameObject entry = Instantiate(PlayerListEntryPrefab);
             entry.transform.SetParent(InsideRoomPanel.transform);
             entry.transform.localScale = Vector3.one;
@@ -168,6 +175,7 @@ namespace Photon.Pun.Demo.Asteroids
 
         public override void OnPlayerLeftRoom(Player otherPlayer)
         {
+            Debug.Log("OnPlayerLeftRoom");
             Destroy(playerListEntries[otherPlayer.ActorNumber].gameObject);
             playerListEntries.Remove(otherPlayer.ActorNumber);
 
@@ -176,6 +184,7 @@ namespace Photon.Pun.Demo.Asteroids
 
         public override void OnMasterClientSwitched(Player newMasterClient)
         {
+            Debug.Log("OnMasterClientSwitched");
             if (PhotonNetwork.LocalPlayer.ActorNumber == newMasterClient.ActorNumber)
             {
                 StartGameButton.gameObject.SetActive(CheckPlayersReady());
@@ -184,6 +193,7 @@ namespace Photon.Pun.Demo.Asteroids
 
         public override void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)
         {
+            Debug.Log("OnPlayerPropertiesUpdate");
             if (playerListEntries == null)
             {
                 playerListEntries = new Dictionary<int, GameObject>();
@@ -195,7 +205,7 @@ namespace Photon.Pun.Demo.Asteroids
                 object isPlayerReady;
                 if (changedProps.TryGetValue(AsteroidsGame.PLAYER_READY, out isPlayerReady))
                 {
-                    entry.GetComponent<PlayerListEntry>().SetPlayerReady((bool) isPlayerReady);
+                    entry.GetComponent<PlayerListEntry>().SetPlayerReady((bool)isPlayerReady);
                 }
             }
 
@@ -223,18 +233,11 @@ namespace Photon.Pun.Demo.Asteroids
 
             byte maxPlayers;
             byte.TryParse(MaxPlayersInputField.text, out maxPlayers);
-            maxPlayers = (byte) Mathf.Clamp(maxPlayers, 2, 8);
+            maxPlayers = (byte)Mathf.Clamp(maxPlayers, 2, 8);
 
-            RoomOptions options = new RoomOptions {MaxPlayers = maxPlayers, PlayerTtl = 10000 };
+            RoomOptions options = new RoomOptions { MaxPlayers = maxPlayers, PlayerTtl = 10000 };
 
             PhotonNetwork.CreateRoom(roomName, options, null);
-        }
-
-        public void OnJoinRandomRoomButtonClicked()
-        {
-            SetActivePanel(JoinRandomRoomPanel.name);
-
-            PhotonNetwork.JoinRandomRoom();
         }
 
         public void OnLeaveGameButtonClicked()
@@ -245,6 +248,7 @@ namespace Photon.Pun.Demo.Asteroids
         public void OnLoginButtonClicked()
         {
             string playerName = PlayerNameInput.text;
+            Debug.Log("OnLoginButton clicked");
 
             if (!playerName.Equals(""))
             {
@@ -272,7 +276,7 @@ namespace Photon.Pun.Demo.Asteroids
             PhotonNetwork.CurrentRoom.IsOpen = false;
             PhotonNetwork.CurrentRoom.IsVisible = false;
 
-            PhotonNetwork.LoadLevel("DemoAsteroids-GameScene");
+            PhotonNetwork.LoadLevel("MainScene");
         }
 
         #endregion
@@ -289,7 +293,7 @@ namespace Photon.Pun.Demo.Asteroids
                 object isPlayerReady;
                 if (p.CustomProperties.TryGetValue(AsteroidsGame.PLAYER_READY, out isPlayerReady))
                 {
-                    if (!(bool) isPlayerReady)
+                    if (!(bool)isPlayerReady)
                     {
                         return false;
                     }
@@ -302,7 +306,7 @@ namespace Photon.Pun.Demo.Asteroids
 
             return true;
         }
-        
+
         private void ClearRoomListView()
         {
             foreach (GameObject entry in roomListEntries.Values)
@@ -323,7 +327,6 @@ namespace Photon.Pun.Demo.Asteroids
             LoginPanel.SetActive(activePanel.Equals(LoginPanel.name));
             SelectionPanel.SetActive(activePanel.Equals(SelectionPanel.name));
             CreateRoomPanel.SetActive(activePanel.Equals(CreateRoomPanel.name));
-            JoinRandomRoomPanel.SetActive(activePanel.Equals(JoinRandomRoomPanel.name));
             RoomListPanel.SetActive(activePanel.Equals(RoomListPanel.name));    // UI should call OnRoomListButtonClicked() to activate this
             InsideRoomPanel.SetActive(activePanel.Equals(InsideRoomPanel.name));
         }

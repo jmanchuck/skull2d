@@ -4,6 +4,7 @@ using UnityEngine;
 using Photon.Pun;
 using UnityEngine.UI;
 
+// To be attached with PhotonView for synchronisation
 public class PlayerController : MonoBehaviour
 {
     [SerializeField] public GameObject SkullCard;
@@ -14,8 +15,10 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField] private bool IsMine;
 
+
     public void Awake()
     {
+
         Animator = GetComponent<Animator>();
     }
 
@@ -41,10 +44,10 @@ public class PlayerController : MonoBehaviour
     {
         if (IsMine)
         {
-
-            // ShowPlayerOptions blahblahblah
+            // ShowPlayerOptions 
         }
         Animator.SetBool("IsThinking", true);
+
     }
 
     private void ShowPlayerOptions()
